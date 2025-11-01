@@ -1,0 +1,12 @@
+{"level":"info","message":"🚀 Server running on port 3001","timestamp":"2025-11-01T10:52:49.209Z"}
+{"level":"info","message":"📍 Configured for: UTTAR PRADESH","timestamp":"2025-11-01T10:52:49.211Z"}
+{"level":"info","message":"🌍 Environment: undefined","timestamp":"2025-11-01T10:52:49.211Z"}
+{"level":"info","message":"🔄 Starting initial UP data sync...","timestamp":"2025-11-01T10:52:49.211Z"}
+{"level":"info","message":"⏳ Starting MGNREGA data sync for UTTAR PRADESH...","timestamp":"2025-11-01T10:52:49.212Z"}
+{"level":"info","message":"📅 Syncing UTTAR PRADESH - Year: 2024-2025","timestamp":"2025-11-01T10:52:49.212Z"}
+{"level":"info","message":"Redis connected successfully","timestamp":"2025-11-01T10:52:49.232Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-11-01T10:52:49.246Z"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 0)","timestamp":"2025-11-01T10:52:55.664Z"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 1000)","timestamp":"2025-11-01T10:53:01.735Z"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 2000)","timestamp":"2025-11-01T10:53:07.643Z"}
+{"level":"info","message":"Received shutdown signal, closing gracefully...","timestamp":"2025-11-01T10:53:08.089Z"}
