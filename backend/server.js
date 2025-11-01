@@ -1,4 +1,3 @@
-// server.js - UP-Specific MGNREGA Server
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');

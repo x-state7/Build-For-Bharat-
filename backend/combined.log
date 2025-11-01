@@ -1,0 +1,62 @@
+{"level":"info","message":"🚀 Server running on port 3001"}
+{"level":"info","message":"📍 Configured for: UTTAR PRADESH"}
+{"level":"info","message":"🔄 Starting initial UP data sync..."}
+{"level":"info","message":"⏳ Starting MGNREGA data sync for UTTAR PRADESH..."}
+{"level":"info","message":"📅 Syncing UTTAR PRADESH - Year: 2024-2025"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 0)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 1000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 2000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 3000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 4000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 5000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 6000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 7000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 8000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 9000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 10000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 11000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 12000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 13000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 14000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 15000)"}
+{"level":"info","message":"✅ Synced 89 UP records (offset: 16000)"}
+{"level":"info","message":"📅 Syncing UTTAR PRADESH - Year: 2023-2024"}
+{"level":"info","message":"✅ Synced 900 UP records (offset: 0)"}
+{"level":"info","message":"📅 Syncing UTTAR PRADESH - Year: 2022-2023"}
+{"level":"info","message":"✅ Synced 900 UP records (offset: 0)"}
+{"level":"info","message":"📅 Syncing UTTAR PRADESH - Year: 2021-2022"}
+{"level":"info","message":"✅ Synced 900 UP records (offset: 0)"}
+{"level":"info","message":"✅ UP Sync complete! Total records synced: 18789"}
+{"level":"info","message":"🕑 Running scheduled UP sync..."}
+{"level":"info","message":"⏳ Starting MGNREGA data sync for UTTAR PRADESH..."}
+{"level":"info","message":"📅 Syncing UTTAR PRADESH - Year: 2024-2025"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 0)"}
+{"level":"error","message":"❌ UP Sync error:"}
+{"level":"info","message":"🕑 Running scheduled UP sync..."}
+{"level":"info","message":"⏳ Starting MGNREGA data sync for UTTAR PRADESH..."}
+{"level":"info","message":"📅 Syncing UTTAR PRADESH - Year: 2024-2025"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 0)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 1000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 2000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 3000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 4000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 5000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 6000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 7000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 8000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 9000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 10000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 11000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 12000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 13000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 14000)"}
+{"level":"info","message":"✅ Synced 1000 UP records (offset: 15000)"}
+{"level":"info","message":"✅ Synced 89 UP records (offset: 16000)"}
+{"level":"info","message":"📅 Syncing UTTAR PRADESH - Year: 2023-2024"}
+{"level":"info","message":"✅ Synced 900 UP records (offset: 0)"}
+{"level":"info","message":"📅 Syncing UTTAR PRADESH - Year: 2022-2023"}
+{"level":"info","message":"✅ Synced 900 UP records (offset: 0)"}
+{"level":"info","message":"📅 Syncing UTTAR PRADESH - Year: 2021-2022"}
+{"level":"info","message":"✅ Synced 900 UP records (offset: 0)"}
+{"level":"info","message":"✅ UP Sync complete! Total records synced: 18789"}
+{"level":"info","message":"SIGTERM received, closing gracefully"}

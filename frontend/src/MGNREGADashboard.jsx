@@ -5,7 +5,6 @@ import {
   ChevronDown, Home,Landmark, Globe,Search, Phone, HelpCircle, Building, BarChart2, X
 } from 'lucide-react';
 
-// Framer Motion alternative - CSS-based animations
 const FadeIn = ({ children, delay = 0, className = "" }) => {
   const [isVisible, setIsVisible] = useState(false);
   
@@ -21,6 +20,7 @@ const FadeIn = ({ children, delay = 0, className = "" }) => {
       } ${className}`}
     >
       {children}
+    
     </div>
   );
 };
@@ -109,13 +109,15 @@ const MGNREGADashboard = () => {
   const [error, setError] = useState(null);
   const [dataSource, setDataSource] = useState('cache');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showDistrictList, setShowDistrictList] = useState(false);
+  const [showDistrictList, setShowDistrictList] = useState(false); // Unused but kept for consistency
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [currentStep, setCurrentStep] = useState('language-select');
   const [selectedLanguage, setSelectedLanguage] = useState('hi');
   const [infoModal, setInfoModal] = useState(null);
 
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+  const API_BASE_URL ='http://localhost:3001';
+  const UP_STATE_KEY = 'UTTAR PRADESH'; // Constant for UP State key
+  
   const translations = {
     hi: {
       appName: 'मनरेगा',
@@ -182,6 +184,8 @@ const MGNREGADashboard = () => {
       infoTotalGrowth: 'यह सबसे हाल के *पूर्ण* वर्ष के प्रदर्शन की तुलना सबसे पुराने *पूर्ण* वर्ष से करता है ताकि लंबी अवधि का रुझान दिखाया जा सके।',
       infoYearsTracked: 'इस सारांश में उपलब्ध डेटा वाले वित्तीय वर्षों की कुल संख्या।',
       infoBestYear: 'वह वित्तीय वर्ष जिसमें सबसे अधिक \'कुल कार्य दिवस\' उत्पन्न हुए थे।',
+      nonUPUser: 'आप उत्तर प्रदेश में नहीं हैं। कृपया अपना जिला मैन्युअल रूप से चुनें।',
+      upUser: 'आपका जिला पता चल गया है।'
     },
     en: {
       appName: 'MGNREGA',
@@ -248,6 +252,8 @@ const MGNREGADashboard = () => {
       infoTotalGrowth: 'This compares the performance of the most recent *complete* year with the oldest *complete* year to show the long-term trend.',
       infoYearsTracked: 'The total number of financial years for which data is available in this summary.',
       infoBestYear: 'The financial year that had the highest \'Total Work Days\' generated.',
+      nonUPUser: 'You are not in Uttar Pradesh. Please select your district manually.',
+      upUser: 'Your district has been detected.'
     }
   };
 
@@ -368,6 +374,9 @@ const MGNREGADashboard = () => {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         try {
+          // --- START: MODIFIED LOGIC FOR LOCATION DETECTION ---
+          // NOTE: In a real app, this API call would do a reverse geocode 
+          // to get the State and District from the coordinates.
           const response = await fetch(`${API_BASE_URL}/api/detect-district`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -378,21 +387,43 @@ const MGNREGADashboard = () => {
           });
           
           const data = await response.json();
-          const detected = data.district || 'LUCKNOW';
-          
-          setDistrict(detected.toUpperCase());
-          setLocationStatus('detected');
-          setCurrentStep('data-view');
-          fetchDistrictData(detected.toUpperCase());
+          // Simulate the response to include 'state'
+          // Example: { district: 'LUCKNOW', state: 'UTTAR PRADESH' }
+          // Or: { district: 'PATNA', state: 'BIHAR' }
+          const detectedDistrictKey = data.district?.toUpperCase() || 'LUCKNOW';
+          const detectedState = data.state?.toUpperCase() || UP_STATE_KEY; // Default to UP for simulation
+
+          // Check if the detected state is UP AND the district is in our UP list
+          const isUPUser = detectedState === UP_STATE_KEY && 
+                           upDistricts.some(d => d.key === detectedDistrictKey);
+
+          if (isUPUser) {
+            setDistrict(detectedDistrictKey);
+            setLocationStatus('detected');
+            setCurrentStep('data-view');
+            fetchDistrictData(detectedDistrictKey);
+            speak(`${t.upUser} ${getDistrictDisplayName(detectedDistrictKey)}`);
+          } else {
+            // Not a UP user (or not in our list), ask them to select manually
+            setLocationStatus('non-up');
+            setCurrentStep('district-select');
+            setLoading(false);
+            speak(t.nonUPUser);
+          }
+          // --- END: MODIFIED LOGIC FOR LOCATION DETECTION ---
         } catch (err) {
+          // If the backend call fails, proceed to manual selection
+          setLocationStatus('api-error');
           setCurrentStep('district-select');
           setLoading(false);
+          speak(t.errorLoading);
         }
       },
       (error) => {
         setLocationStatus('denied');
         setCurrentStep('district-select');
         setLoading(false);
+        speak(t.nonUPUser);
       }
     );
   };
@@ -468,7 +499,7 @@ const MGNREGADashboard = () => {
     
     return {
       district: districtName,
-      state: 'UTTAR PRADESH',
+      state: UP_STATE_KEY,
       finYear: apiData.fin_year || selectedYear,
       totalJobCards: apiData.job_cards_issued || 0,
       activeWorkers: apiData.active_job_cards || 0,
@@ -626,6 +657,10 @@ const MGNREGADashboard = () => {
                 <div className="relative text-8xl text-emerald-700 animate-bounce">🗺️</div>
               </div>
               <h1 className="text-5xl font-bold text-gray-800 mb-2">{t.selectDistrict}</h1>
+              {/* Conditional message for non-UP user or error */}
+              {locationStatus !== 'detected' && locationStatus !== 'detecting' && (
+                <p className="text-lg text-red-500 font-semibold mt-2">{t.nonUPUser}</p>
+              )}
               <p className="text-lg text-gray-500">{t.tapToHear}</p>
             </div>
           </FadeIn>
