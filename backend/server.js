@@ -19,46 +19,21 @@ const TARGET_STATE = "UTTAR PRADESH";
 
 // Logger Configuration
 const logger = winston.createLogger({
-  level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
+  level: 'info',
+  format: winston.format.json(),
   transports: [
-    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'logs/combined.log' }),
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' }),
+    new winston.transports.Console({ format: winston.format.simple() })
   ]
 });
 
-// console logging in development
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.simple()
-  }));
-}
 // Redis Client
 const redis = new Redis({
   host: process.env.REDIS_HOST || 'localhost',
   port: process.env.REDIS_PORT || 6379,
-  retryStrategy: (times) => {
-    const delay = Math.min(times * 50, 2000);
-    return delay;
-  },
-  maxRetriesPerRequest: 3,
-  enableReadyCheck: true,
-  lazyConnect: true
-});
-redis.on('error', (err) => {
-  logger.error('Redis connection error:', err);
-});
-
-redis.on('connect', () => {
-  logger.info('Redis connected successfully');
-});
-
-// Connect to Redis
-redis.connect().catch(err => {
-  logger.error('Failed to connect to Redis:', err);
+  retryStrategy: (times) => Math.min(times * 50, 2000),
+  maxRetriesPerRequest: 3
 });
 
 // PostgreSQL Connection Pool
@@ -72,45 +47,22 @@ const pool = new Pool({
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
 });
-// Test database connection
-pool.query('SELECT NOW()', (err, res) => {
-  if (err) {
-    logger.error('Database connection error:', err);
-  } else {
-    logger.info('Database connected successfully');
-  }
-});
 
 // Middleware
-app.use(helmet({
-  contentSecurityPolicy: false,
-  crossOriginEmbedderPolicy: false
-}));
+app.use(helmet());
 app.use(compression());
-
-// CORS configuration for production
-const corsOptions = {
+app.use(cors({
   origin: process.env.FRONTEND_URL || '*',
-  credentials: true,
-  optionsSuccessStatus: 200
-};
-app.use(cors(corsOptions));
-
+  credentials: true
+}));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/build')));
-}
+app.use(express.static('public'));
 
 // Rate Limiting
 const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
-  message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true,
-  legacyHeaders: false,
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Too many requests from this IP, please try again later.'
 });
 app.use('/api/', limiter);
 
@@ -153,7 +105,7 @@ async function fetchFromDataGov(params) {
     const upParams = {
       'api-key': DATA_GOV_API_KEY,
       format: 'json',
-      limit: 10000,
+      limit: 1000,
       'filters[state_name]': TARGET_STATE,
       ...params
     };
@@ -437,10 +389,10 @@ app.get('/health', (req, res) => {
     state: TARGET_STATE,
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    circuitBreaker: circuitState.isOpen ? 'open' : 'closed',
-    environment: process.env.NODE_ENV
+    circuitBreaker: circuitState.isOpen ? 'open' : 'closed'
   });
 });
+
 // Manual Sync
 app.post("/api/sync-now", async (req, res) => {
   logger.info(`Manual UP sync triggered`);
@@ -640,51 +592,18 @@ function isDataFresh(updatedAt, hoursThreshold) {
   return hoursDiff < hoursThreshold;
 }
 
-// Serve frontend in production
-if (process.env.NODE_ENV === 'production') {
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
-  });
-}
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  logger.error('Unhandled error:', err);
-  res.status(500).json({
-    error: 'Internal server error',
-    message: process.env.NODE_ENV === 'production' ? 'Something went wrong' : err.message
-  });
+// Graceful Shutdown
+process.on('SIGTERM', async () => {
+  logger.info('SIGTERM received, closing gracefully');
+  await redis.quit();
+  await pool.end();
+  process.exit(0);
 });
 
-// Graceful Shutdown
-const gracefulShutdown = async () => {
-  logger.info('Received shutdown signal, closing gracefully...');
-  
-  try {
-    await redis.quit();
-    await pool.end();
-    process.exit(0);
-  } catch (err) {
-    logger.error('Error during shutdown:', err);
-    process.exit(1);
-  }
-};
-
-process.on('SIGTERM', gracefulShutdown);
-process.on('SIGINT', gracefulShutdown);
-
 // Start Server
-const server = app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, () => {
   logger.info(`🚀 Server running on port ${PORT}`);
   logger.info(`📍 Configured for: ${TARGET_STATE}`);
-  logger.info(`🌍 Environment: ${process.env.NODE_ENV}`);
   logger.info('🔄 Starting initial UP data sync...');
   syncMGNREGAData();
 });
-
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (reason, promise) => {
-  logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
-});
-
-module.exports = server;
